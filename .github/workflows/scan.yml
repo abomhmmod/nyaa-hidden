@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: "7,37 * * * *"
   workflow_dispatch:
+    inputs:
+      test_notify:
+        description: "Only send a Telegram test message (no scan)"
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -28,7 +33,11 @@ jobs:
           json.dump({"discord_webhook": "", "telegram_token": os.environ["TG_TOKEN"],
                      "telegram_chat_id": os.environ["TG_CHAT"]}, open("config.json", "w"))
           PY
+      - name: Test notification
+        if: ${{ inputs.test_notify }}
+        run: python3 -B nyaa_hidden_torrents.py --test-notify | tee /dev/stderr | grep -q "Test message sent"
       - name: Scan
+        if: ${{ !inputs.test_notify }}
         env:
           TZ: Asia/Damascus
         run: python3 -B nyaa_hidden_torrents.py --no-open --max-minutes 22

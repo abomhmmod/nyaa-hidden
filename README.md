@@ -9,7 +9,7 @@
   و`التورنتات المخفية.html` (القائمة؛ نزّلها وافتحها في المتصفّح). يحدّثها الفحص بنفسه.
 - **الأسرار:** `TELEGRAM_TOKEN` و`TELEGRAM_CHAT_ID` في Settings ← Secrets and variables ← Actions.
 
-**تشغيل فوريّ:** تبويب Actions ← Scan nyaa hidden torrents ← Run workflow.
+**تشغيل فوريّ:** تبويب Actions ← Scan nyaa hidden torrents ← Run workflow (واختر test_notify لإرسال رسالة اختبار فقط).
 **الإيقاف:** تبويب Actions ← Scan nyaa hidden torrents ← ⋯ ← Disable workflow.
 
 الرصيد المجّانيّ للمستودع الخاصّ نحو 2000 دقيقة في الشهر، والفحص كلّ 30 دقيقة يستهلك قرابة 1450 منها.
