@@ -1,0 +1,45 @@
+name: Scan nyaa hidden torrents
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: nyaa-scan
+  cancel-in-progress: false
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write config from secrets
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "::error::TELEGRAM_TOKEN / TELEGRAM_CHAT_ID secrets are missing — not scanning, so no alert is lost."
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, os
+          json.dump({"discord_webhook": "", "telegram_token": os.environ["TG_TOKEN"],
+                     "telegram_chat_id": os.environ["TG_CHAT"]}, open("config.json", "w"))
+          PY
+      - name: Scan
+        env:
+          TZ: Asia/Damascus
+        run: python3 -B nyaa_hidden_torrents.py --no-open --max-minutes 22
+      - name: Save progress
+        if: always()
+        run: |
+          rm -f config.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898231+github-actions[bot]@users.noreply.github.com"
+          git add -A archive.json state.json "التورنتات المخفية.html"
+          if ! git diff --cached --quiet; then
+            git commit -q -m "scan: $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push -q
+          fi
