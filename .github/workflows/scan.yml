@@ -29,7 +29,14 @@ jobs:
             exit 1
           fi
           python3 - <<'PY'
-          import json, os
+          import json, os, sys, urllib.request, urllib.error
+          tok = os.environ["TG_TOKEN"].strip()
+          try:
+              with urllib.request.urlopen("https://api.telegram.org/bot%s/getMe" % tok, timeout=20) as r:
+                  print("Telegram bot:", "@" + json.load(r)["result"]["username"])
+          except urllib.error.HTTPError as e:
+              print("::error::Telegram rejected TELEGRAM_TOKEN (HTTP %d) — fix the secret; not scanning, so no alert is lost." % e.code)
+              sys.exit(1)
           json.dump({"discord_webhook": "", "telegram_token": os.environ["TG_TOKEN"],
                      "telegram_chat_id": os.environ["TG_CHAT"]}, open("config.json", "w"))
           PY
