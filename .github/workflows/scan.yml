@@ -1,7 +1,9 @@
 name: Scan nyaa hidden torrents
 on:
   schedule:
-    - cron: "7,37 * * * *"
+    # كلّ 3 ساعات (8 مرّات يوميًّا). كلّ تشغيل يُحسب دقيقة على الأقلّ، والفحص محدود
+    # بدقيقة واحدة؛ فالاستهلاك نحو 250 دقيقة شهريًّا ولا يتجاوز 500 في أسوأ الأحوال.
+    - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
       test_notify:
@@ -16,7 +18,7 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
       - name: Write config from secrets
@@ -47,7 +49,7 @@ jobs:
         if: ${{ !inputs.test_notify }}
         env:
           TZ: Asia/Damascus
-        run: python3 -B nyaa_hidden_torrents.py --no-open --max-minutes 22
+        run: python3 -B nyaa_hidden_torrents.py --no-open --max-minutes 1
       - name: Save progress
         if: always()
         run: |
