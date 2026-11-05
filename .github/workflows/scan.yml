@@ -21,7 +21,10 @@ jobs:
       group: nyaa-scan
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      # آخر نسخة من الفرع لا نسخة لحظة الطلب، حتّى يبدأ الفحص من آخر نقطة حفظها الفحص السابق.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
       - name: Write config from secrets
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -63,10 +66,10 @@ jobs:
             git push -q
           fi
   wake:
-    # الإيقاظ الذاتيّ: بعد انتهاء الفحص ينتظر GitHub مدّة مؤقّت البيئة wake-30 (30 دقيقة)
-    # (تُضبط المدّة من Settings ← Environments)، ثمّ يطلب هذا التشغيلُ تشغيلًا جديدًا. والانتظار لا يشغل خادمًا.
+    # الإيقاظ الذاتيّ: بعد انتهاء الفحص ينتظر GitHub مدّة مؤقّت البيئة wake-30 (30 دقيقة؛ تُضبط من
+    # Settings ← Environments)، ثمّ يطلب هذا التشغيلُ تشغيلًا جديدًا. والانتظار لا يشغل خادمًا.
     # إن بدأ في الأثناء تشغيل أحدث (من الجدولة أو يدويًّا) فهو الذي يُكمل وهذا يتوقّف، فتبقى سلسلة واحدة.
-    # يعمل ولو فشل الفحص، حتّى لا تنقطع السلسلة. وإيقاف البوت يكون بـ Disable workflow.
+    # يعمل ولو فشل ما قبله، حتّى لا تنقطع السلسلة. وإيقاف البوت يكون بـ Disable workflow.
     needs: scan
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -83,9 +86,38 @@ jobs:
           REF: ${{ github.event.repository.default_branch || 'main' }}
           TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # صمام أمان: لا يُطلب تشغيل جديد قبل مرور هذه الثواني على بدء هذا التشغيل. فلو لم يُطبَّق
+          # مؤقّت الانتظار (حُذفت البيئة أو أُلغي مؤقّتها، أو صار المستودع خاصًّا على الخطّة المجّانيّة)
+          # لتتابعت التشغيلات بلا توقّف.
+          MIN_AGE: 300
         run: |
+          warn() {  # $1: سطر في سجلّ التشغيل، $2: تنبيه إلى تيلغرام
+            echo "::error::$1"
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${TG_CHAT}" \
+              --data-urlencode "text=⚠️ ${GITHUB_REPOSITORY}: $2") || true
+            echo "Telegram warning: HTTP ${code:-none}"
+          }
           wf="${GITHUB_WORKFLOW_REF#*/.github/workflows/}"; wf="${wf%@*}"
           api="repos/$GITHUB_REPOSITORY/actions/workflows/$wf"
+
+          started=""
+          for i in 1 2 3 4 5 6; do
+            started=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .run_started_at 2>/dev/null) && [ -n "$started" ] && break
+            sleep 20
+          done
+          if [ -z "$started" ]; then
+            warn "Could not reach the GitHub API to read this run's start time." \
+                 "تعذّر الاتّصال بواجهة GitHub، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow."
+            exit 1
+          fi
+          age=$(( $(date +%s) - $(date -d "$started" +%s) ))
+          if [ "$age" -lt "$MIN_AGE" ]; then
+            warn "This run is only ${age}s old, so the wait timer was not applied. Not requesting another run." \
+                 "مؤقّت الانتظار لم يُطبَّق، فأوقفتُ الإيقاظ الذاتيّ حتّى لا تتتابع التشغيلات بلا توقّف. راجع المؤقّت في Settings ← Environments، وتأكّد أنّ المستودع عامّ، ثمّ اضغط Run workflow في تبويب Actions."
+            exit 1
+          fi
+
           newest=""
           for i in 1 2 3 4 5 6; do
             newest=$(gh api "$api/runs?per_page=1" --jq '.workflow_runs[0] | "\(.id) \(.status)"' 2>/dev/null) && [ -n "$newest" ] && break
@@ -95,6 +127,7 @@ jobs:
             echo "A newer run (${newest%% *}) is under way; it will request the next one."
             exit 0
           fi
+
           err=""
           for i in 1 2 3 4 5 6 7 8; do
             if err=$(gh api -X POST "$api/dispatches" -f ref="$REF" 2>&1); then
@@ -108,8 +141,6 @@ jobs:
             esac
             sleep 45
           done
-          echo "::error::Could not request the next run: $err"
-          curl -sS -o /dev/null --max-time 30 "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TG_CHAT}" \
-            --data-urlencode "text=⚠️ ${GITHUB_REPOSITORY}: تعذّر طلب التشغيل التالي، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow." || true
+          warn "Could not request the next run: $err" \
+               "تعذّر طلب التشغيل التالي، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow."
           exit 1
