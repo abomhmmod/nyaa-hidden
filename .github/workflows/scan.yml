@@ -61,3 +61,5 @@ jobs:
             git commit -q -m "scan: $(date -u +%Y-%m-%dT%H:%MZ)"
             git push -q
           fi
+
+# schedule registered from the GitHub web editor
