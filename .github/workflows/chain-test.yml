@@ -1,0 +1,83 @@
+name: chain-test
+# تجربة مؤقّتة: هل يستطيع التشغيل أن يستدعي نفسه (بمهلة انتظار وبدونها)؟ يُحذف بعد التجربة.
+run-name: "chain-test ${{ inputs.mode }} n=${{ inputs.n }}"
+on:
+  workflow_dispatch:
+    inputs:
+      n:
+        description: "links left"
+        default: "0"
+      mode:
+        description: "fast | timer | nodeploy"
+        default: "fast"
+permissions: {}
+jobs:
+  work:
+    runs-on: ubuntu-slim
+    timeout-minutes: 2
+    steps:
+      - run: echo "link n=${{ inputs.n }} mode=${{ inputs.mode }} actor=${{ github.actor }} at $(date -u +%H:%M:%S)"
+  next-fast:
+    needs: work
+    if: ${{ always() && inputs.mode == 'fast' && inputs.n != '0' }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    steps:
+      - name: dispatch next link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          N: ${{ inputs.n }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          echo "woke at $(date -u +%H:%M:%S)"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/chain-test.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"n\":\"$((N-1))\",\"mode\":\"$MODE\"}}"
+          echo "dispatched n=$((N-1))"
+  next-timer:
+    needs: work
+    if: ${{ always() && inputs.mode == 'timer' && inputs.n != '0' }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 2
+    environment: wake-1
+    permissions:
+      actions: write
+    steps:
+      - name: dispatch next link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          N: ${{ inputs.n }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          echo "woke at $(date -u +%H:%M:%S)"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/chain-test.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"n\":\"$((N-1))\",\"mode\":\"$MODE\"}}"
+          echo "dispatched n=$((N-1))"
+  next-nodeploy:
+    needs: work
+    if: ${{ always() && inputs.mode == 'nodeploy' && inputs.n != '0' }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 2
+    environment:
+      name: wake-1
+      deployment: false
+    permissions:
+      actions: write
+    steps:
+      - name: dispatch next link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          N: ${{ inputs.n }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          echo "woke at $(date -u +%H:%M:%S)"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/chain-test.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"n\":\"$((N-1))\",\"mode\":\"$MODE\"}}"
+          echo "dispatched n=$((N-1))"
