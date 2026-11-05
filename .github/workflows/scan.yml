@@ -63,7 +63,7 @@ jobs:
             git push -q
           fi
   wake:
-    # الإيقاظ الذاتيّ: بعد انتهاء الفحص ينتظر GitHub مدّة مؤقّت البيئة wake-1
+    # الإيقاظ الذاتيّ: بعد انتهاء الفحص ينتظر GitHub مدّة مؤقّت البيئة wake-30 (30 دقيقة)
     # (تُضبط المدّة من Settings ← Environments)، ثمّ يطلب هذا التشغيلُ تشغيلًا جديدًا. والانتظار لا يشغل خادمًا.
     # إن بدأ في الأثناء تشغيل أحدث (من الجدولة أو يدويًّا) فهو الذي يُكمل وهذا يتوقّف، فتبقى سلسلة واحدة.
     # يعمل ولو فشل الفحص، حتّى لا تنقطع السلسلة. وإيقاف البوت يكون بـ Disable workflow.
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
-      name: wake-1
+      name: wake-30
       deployment: false
     permissions:
       actions: write
