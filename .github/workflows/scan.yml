@@ -1,8 +1,8 @@
 name: Scan nyaa hidden torrents
 on:
   schedule:
-    # كلّ 3 ساعات (8 مرّات يوميًّا). كلّ تشغيل يُحسب دقيقة على الأقلّ، والفحص محدود
-    # بدقيقة واحدة؛ فالاستهلاك نحو 250 دقيقة شهريًّا ولا يتجاوز 500 في أسوأ الأحوال.
+    # احتياط فقط. الفحص الدوريّ يقوم به «الإيقاظ الذاتيّ» (مهمّة wake في آخر هذا الملفّ) كلّ 30 دقيقة.
+    # جدولة GitHub هذه تُسقط كثيرًا من مواعيدها، فدورها هنا أن تعيد تشغيل السلسلة إن انقطعت.
     - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
@@ -12,13 +12,14 @@ on:
         default: false
 permissions:
   contents: write
-concurrency:
-  group: nyaa-scan
-  cancel-in-progress: false
 jobs:
   scan:
     runs-on: ubuntu-latest
     timeout-minutes: 4
+    # لا يتداخل فحصان. (القيد على مهمّة الفحص وحدها، حتّى لا يحجز انتظارُ مهمّة wake الفحصَ التالي.)
+    concurrency:
+      group: nyaa-scan
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - name: Write config from secrets
@@ -55,11 +56,60 @@ jobs:
         run: |
           rm -f config.json
           git config user.name "github-actions[bot]"
-          git config user.email "41898231+github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A archive.json state.json "التورنتات المخفية.html"
           if ! git diff --cached --quiet; then
             git commit -q -m "scan: $(date -u +%Y-%m-%dT%H:%MZ)"
             git push -q
           fi
-
-# schedule registered from the GitHub web editor
+  wake:
+    # الإيقاظ الذاتيّ: بعد انتهاء الفحص ينتظر GitHub مدّة مؤقّت البيئة wake-1
+    # (تُضبط المدّة من Settings ← Environments)، ثمّ يطلب هذا التشغيلُ تشغيلًا جديدًا. والانتظار لا يشغل خادمًا.
+    # إن بدأ في الأثناء تشغيل أحدث (من الجدولة أو يدويًّا) فهو الذي يُكمل وهذا يتوقّف، فتبقى سلسلة واحدة.
+    # يعمل ولو فشل الفحص، حتّى لا تنقطع السلسلة. وإيقاف البوت يكون بـ Disable workflow.
+    needs: scan
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: wake-1
+      deployment: false
+    permissions:
+      actions: write
+    steps:
+      - name: Request the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF: ${{ github.event.repository.default_branch || 'main' }}
+          TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          wf="${GITHUB_WORKFLOW_REF#*/.github/workflows/}"; wf="${wf%@*}"
+          api="repos/$GITHUB_REPOSITORY/actions/workflows/$wf"
+          newest=""
+          for i in 1 2 3 4 5 6; do
+            newest=$(gh api "$api/runs?per_page=1" --jq '.workflow_runs[0] | "\(.id) \(.status)"' 2>/dev/null) && [ -n "$newest" ] && break
+            sleep 20
+          done
+          if [ -n "$newest" ] && [ "${newest%% *}" != "$GITHUB_RUN_ID" ] && [ "${newest#* }" != "completed" ]; then
+            echo "A newer run (${newest%% *}) is under way; it will request the next one."
+            exit 0
+          fi
+          err=""
+          for i in 1 2 3 4 5 6 7 8; do
+            if err=$(gh api -X POST "$api/dispatches" -f ref="$REF" 2>&1); then
+              echo "Next run requested."
+              exit 0
+            fi
+            echo "Attempt $i failed: $err"
+            case "$err" in
+              *"disabled workflow"*) echo "The workflow is disabled, so the chain stops here."; exit 0 ;;
+              *"HTTP 403"*|*"HTTP 404"*|*"HTTP 422"*) break ;;
+            esac
+            sleep 45
+          done
+          echo "::error::Could not request the next run: $err"
+          curl -sS -o /dev/null --max-time 30 "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=⚠️ ${GITHUB_REPOSITORY}: تعذّر طلب التشغيل التالي، فتوقّف الفحص الدوريّ. لإعادته افتح تبويب Actions في المستودع واضغط Run workflow." || true
+          exit 1
