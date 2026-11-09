@@ -1,5 +1,33 @@
 [
  {
+  "id": 2184202,
+  "view_url": "https://nyaa.si/view/2184202",
+  "download_url": "https://nyaa.si/download/2184202.torrent",
+  "title": "[Mr. Yosha] Dragon Ball Super Beerus - S01E05 (CR WEB 1080p DDP 2.0 x264)",
+  "category": "Anime - English-translated",
+  "category_id": "1_0",
+  "submitter": "Mr_Yosha",
+  "ts": 1794187872,
+  "date": "2026-11-09 04:31",
+  "size": "2.4 GiB",
+  "seeders": "0",
+  "leechers": "2",
+  "completed": "0",
+  "info_hash": "ac10bebaa95df3d287efd7a4f6f948ea4d031886",
+  "magnet": "magnet:?xt=urn:btih:ac10bebaa95df3d287efd7a4f6f948ea4d031886&dn=%5BMr.%20Yosha%5D%20Dragon%20Ball%20Super%20Beerus%20-%20S01E05%20%28CR%20WEB%201080p%20DDP%202.0%20x264%29&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce",
+  "hidden_cue": true,
+  "status": "hidden",
+  "description": "This release changes the simulcast subs to be a hybrid edit of Toei, Simmons, and Dragon Team's translation of the original Super and combines it with the best available sources.\n\n| Video/Source        | Codec           | Encoder         |\n|:-------------:|:-------------:|:-------------:|\n| CR       | H.264         | doncanjas         |\n\n| Audio Source        | Codec           |\n|:-------------:|:-------------:|\n| AMZN         | E-AC3           |\n\n| Subtitle Language        | Sync/Edit By           |\n|:-------------:|:-------------:|\n| English        | emr3ald/SonicMaster            |\n| Japanese        | SonicMaster           |\n\nVideo Comparison\n\nChanges Made\n* Encode instead of a remux\n* All of the subs have been edited to be more alike Steve Simmons and Dragon Team's translations of the 2015 series (with Seed of Might terminology)\n* Episode titles have been Typeset\n* Lyrics for opening and ending have been stylized\n* JP subtitles now contain stylized lyrics, including ruby/furigana for the line that used it and song lyrics\n\nThanks to SonicMaster for muxing everything\nPrevious Episode",
+  "file_count": 1,
+  "files": [
+   [
+    "Dragon.Ball.Super.Beerus.S01E05.CR.WEB.1080p.DDP.2.0.x264.Mr.Yosha.mkv",
+    "2.4 GiB"
+   ]
+  ],
+  "first_seen": 1794189448
+ },
+ {
   "id": 2184173,
   "view_url": "https://nyaa.si/view/2184173",
   "download_url": "https://nyaa.si/download/2184173.torrent",
