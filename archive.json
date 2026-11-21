@@ -1,5 +1,34 @@
 [
  {
+  "id": 2188471,
+  "view_url": "https://nyaa.si/view/2188471",
+  "download_url": "https://nyaa.si/download/2188471.torrent",
+  "title": "[Some-Stuffs] Pocket Monsters (2023) 158 (1080p) [9B1CED44]",
+  "category": "Anime - English-translated",
+  "category_id": "1_0",
+  "submitter": "Toa_of_Gallifrey",
+  "ts": 1795232865,
+  "date": "2026-11-21 06:47",
+  "size": "559.3 MiB",
+  "seeders": "1",
+  "leechers": "0",
+  "completed": "0",
+  "info_hash": "d65b69fc7b0a86a94b0b09fd8f291ba13d8ab33f",
+  "magnet": "magnet:?xt=urn:btih:d65b69fc7b0a86a94b0b09fd8f291ba13d8ab33f&dn=%5BSome-Stuffs%5D%20Pocket%20Monsters%20%282023%29%20158%20%281080p%29%20%5B9B1CED44%5D&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce",
+  "hidden_cue": true,
+  "status": "hidden",
+  "information": "https://some-stuffs.com/",
+  "description": "To avoid running into problems playing any of our releases, please use mpv!\nGet the most up-to-date subs for this project here.\n\nJust the default track this episode because there were no honorifics.",
+  "file_count": 1,
+  "files": [
+   [
+    "[Some-Stuffs] Pocket Monsters (2023) 158 (1080p) [9B1CED44].mkv",
+    "559.3 MiB"
+   ]
+  ],
+  "first_seen": 1795233180
+ },
+ {
   "id": 2188346,
   "view_url": "https://nyaa.si/view/2188346",
   "download_url": "https://nyaa.si/download/2188346.torrent",
