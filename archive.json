@@ -1,5 +1,69 @@
 [
  {
+  "id": 2190477,
+  "view_url": "https://nyaa.si/view/2190477",
+  "download_url": "https://nyaa.si/download/2190477.torrent",
+  "title": "[Ñ] Citrus [BD 1080p]",
+  "category": "Anime - Non-English-translated",
+  "category_id": "1_0",
+  "submitter": "Nyuum",
+  "ts": 1795637839,
+  "date": "2026-11-25 23:17",
+  "size": "5.8 GiB",
+  "seeders": "1",
+  "leechers": "0",
+  "completed": "0",
+  "info_hash": "3479b2a41a16eab06f6ce83d1586e47a201f40d8",
+  "magnet": "magnet:?xt=urn:btih:3479b2a41a16eab06f6ce83d1586e47a201f40d8&dn=%5B%C3%91%5D%20Citrus%20%5BBD%201080p%5D&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce",
+  "hidden_cue": true,
+  "status": "hidden",
+  "information": "https://www.nyuum.es",
+  "file_count": 12,
+  "files": [
+   [
+    "[Ñ] Citrus - 01 [BD 1080p] [7327E64D].mkv",
+    "604.2 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 02 [BD 1080p] [FC0090D5].mkv",
+    "529.2 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 03 [BD 1080p] [100BA863].mkv",
+    "508.7 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 04 [BD 1080p] [DCCF49E5].mkv",
+    "508.3 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 05 [BD 1080p] [1A03A4FD].mkv",
+    "488.6 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 06 [BD 1080p] [18FD9E84].mkv",
+    "517.6 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 07 [BD 1080p] [438F18A4].mkv",
+    "493.0 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 08 [BD 1080p] [4CA8CEFE].mkv",
+    "488.1 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 09 [BD 1080p] [1E0776D3].mkv",
+    "460.2 MiB"
+   ],
+   [
+    "[Ñ] Citrus - 10 [BD 1080p] [A8AD1891].mkv",
+    "490.5 MiB"
+   ]
+  ],
+  "first_seen": 1795639975
+ },
+ {
   "id": 2190129,
   "view_url": "https://nyaa.si/view/2190129",
   "download_url": "https://nyaa.si/download/2190129.torrent",
